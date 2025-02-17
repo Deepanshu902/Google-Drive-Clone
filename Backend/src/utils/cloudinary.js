@@ -16,6 +16,7 @@ const uploadOnCloudinary = async (localFilePath,oldImagePublicId = null) => {
         // Upload the file to Cloudinary
         const response = await cloudinary.uploader.upload(localFilePath, {
             resource_type: "auto", // Auto-detect the file type (image, video, etc.)
+            folder: "drive-clone", 
         });
 
 
