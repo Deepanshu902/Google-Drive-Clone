@@ -15,6 +15,10 @@ const fileSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    cloudinaryPublicId: { // for deleting the file from cloudinary 
+        type: String,
+        required: true
+    },
     contentType: {
         type: String,
         required: true

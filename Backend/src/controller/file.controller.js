@@ -17,6 +17,7 @@ const uploadFile = asyncHandler(async(req,res)=>{
     const newFile = await File.create({
             filename: req.file.filename,
             fileUrl: response.secure_url,
+            cloudinaryPublicId: response.public_id,
             userId: req.user._id,
          })
 
@@ -47,7 +48,7 @@ const deleteFile = asyncHandler(async(req,res)=>{
         throw new ApiError(404, "File not found");
     }
 
-    const deleteResponse = await deleteCloudinaryFile(file.fileUrl)
+    const deleteResponse = await deleteCloudinaryFile(file.cloudinaryPublicId)
 
     if(!deleteResponse){
         throw new ApiError(404,"Error while deleting ")
