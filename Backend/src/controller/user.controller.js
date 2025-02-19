@@ -169,11 +169,24 @@ const changeCurrentPassword = asyncHandler(async(req,res)=>{
    .json(new ApiResponse(200,{},"Password changed Successfully"))
 })
 
+
+const getUserStorage = asyncHandler(async (req, res) => {
+   const user = await User.findById(req.user._id).select("totalStorage usedStorage");
+   if (!user){
+      throw new ApiError(404, "User not found")
+   }
+
+   return res.status(200)
+   .json(new ApiResponse(200, user, "Storage details fetched successfully"));
+});
+
+
 export {
    registerUser,
    loginUser,
    logoutUser,
    updateAccountDetails,
    getCurrentUser,
-   changeCurrentPassword
+   changeCurrentPassword,
+   getUserStorage
 }
