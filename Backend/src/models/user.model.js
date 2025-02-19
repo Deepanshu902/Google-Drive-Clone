@@ -25,6 +25,14 @@ const userSchema = new Schema({
         enum: ["user", "admin"],
         default: "user"
     },
+    totalStorage:{
+        type:String,
+        default:10*1024*1024*1024
+    },
+    usedStorage:{
+        type:Number,
+        default:0
+    },
     refreshToken:{
         type:String
     }

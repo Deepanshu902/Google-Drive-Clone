@@ -25,6 +25,7 @@ const fileSchema = new mongoose.Schema({
     },
     size:{
         type:Number,
+        required:true
     },
     folderId:{
         type:Schema.Types.ObjectId,

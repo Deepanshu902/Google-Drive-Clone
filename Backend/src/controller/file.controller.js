@@ -9,7 +9,16 @@ const uploadFile = asyncHandler(async(req,res)=>{
     const file = req.file
 
     if(!file){
-            throw new ApiError(401,"Upload file")
+         throw new ApiError(401,"Upload file")
+    }
+
+    const user = await User.findById(req.user._id)
+    if (!user){
+         throw new ApiError(404, "User not found")
+    }
+
+    if (user.usedStorage + file.size > user.totalStorage) {
+        throw new ApiError(403, "Storage limit exceeded")
     }
 
     const response = await uploadOnCloudinary(file.path)
@@ -18,12 +27,16 @@ const uploadFile = asyncHandler(async(req,res)=>{
             filename: req.file.filename,
             fileUrl: response.secure_url,
             cloudinaryPublicId: response.public_id,
+            size:file.size,
             userId: req.user._id,
          })
 
     if(!newFile){
         throw new ApiError(500,"Error while uploading file ")
     }
+
+    user.usedStorage += file.size;
+    await user.save();
 
     return res.status(200)
     .json( new ApiResponse(200,newFile,"File uploaded success"))
@@ -53,6 +66,12 @@ const deleteFile = asyncHandler(async(req,res)=>{
     if(!deleteResponse){
         throw new ApiError(404,"Error while deleting ")
     }
+
+    user.usedStorage -= file.size;
+    if (user.usedStorage < 0){
+         user.usedStorage = 0
+    }
+    await user.save();
 
     await File.findByIdAndDelete(req.params.fileId);
 
