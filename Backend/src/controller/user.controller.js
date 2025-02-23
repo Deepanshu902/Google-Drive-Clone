@@ -121,17 +121,12 @@ const updateAccountDetails = asyncHandler(async(req,res)=>{
       throw new ApiError(401,"One feild is required")
    }
 
-   const user = await User.findByIdAndUpdate(req.user._id,
-      {
-         $set:{
-            name,
-            email
-         }
-      },
-      {
-         new:true
-      }
-   ).select("-password refreshToken")
+   const user = await User.findOneAndUpdate( // error here thx to chatgpt my mistake below 
+      { _id: req.user._id },// findOneAndUpdate() does not support both inclusion and exclusion in projections.
+      { $set: req.body },
+      { new: true }
+  ).select("-password"); // ✅ This correctly excludes password
+  
 
    if(!user){
       throw new ApiError(500,"Error while Updating")
