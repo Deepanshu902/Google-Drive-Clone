@@ -21,8 +21,10 @@ app.use(cookieParser())
 
 // all the routes importing
 import userRouter from "./routes/user.routes.js"
+import folderRouter from "./routes/folder.routes.js"
 
 // routes declaration 
 app.use("/api/v1/users", userRouter)
+app.use("/api/v1/folder",folderRouter)
 
 export {app}  
