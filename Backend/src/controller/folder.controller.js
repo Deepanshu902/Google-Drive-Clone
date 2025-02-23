@@ -6,12 +6,12 @@ import {Folder} from "../models/folder.model.js"
 // Imp todo Learn about Error code as i am only using code 200,401 and 500 
 
 const createFolder = asyncHandler(async(req,res)=>{
-    const {folderName,parentFolderId} = req.body
+    const {folderName,parentFolderId} = req.body    
     if(!folderName){
         throw new ApiError(401,"Provide folder name")
     }
 
-    let parentFolder = nul
+    let parentFolder = null
 
     if(parentFolderId){
         parentFolder = await Folder.findById(parentFolderId)
@@ -59,14 +59,14 @@ const renameFolder = asyncHandler(async(req,res)=>{
         throw new ApiError(500,"No folder found ")
     }
 
-    if(folder.userId !== req.user._id ){
+    if(folder.userId.toString() !== req.user._id.toString()){ // userId is objectId from mongoose and user._id is string from jwt and to compare them we used toString()
         throw new ApiError(401,"You cannot rename folder")
     }
 
     // remember to add check for duplicate folder name 
     // todo
 
-    folder.name = newName
+    folder.folderName = newName
     await folder.save()
 
     return res.status(200)
@@ -82,7 +82,7 @@ const deleteFolder = asyncHandler(async(req,res)=>{
         throw new ApiError(401,"Folder dont exist ")
     }
 
-    if(folder.userId !== req.user._id){
+    if(folder.userId.toString() !== req.user._id.toString()){ 
         throw new ApiError(401,"You cannot delete folder")
     }
 

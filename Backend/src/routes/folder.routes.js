@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { upload } from "../middleware/multer.middleware";
+import { upload } from "../middleware/multer.middleware.js";
 import  {
     createFolder,
     renameFolder,
