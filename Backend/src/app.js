@@ -22,9 +22,11 @@ app.use(cookieParser())
 // all the routes importing
 import userRouter from "./routes/user.routes.js"
 import folderRouter from "./routes/folder.routes.js"
+import SharedAccessRouter from "./routes/sharedAccess.routes.js"
 
 // routes declaration 
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/folder",folderRouter)
+app.use("/api/v1/shared",SharedAccessRouter)
 
 export {app}  

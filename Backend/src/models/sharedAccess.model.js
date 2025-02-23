@@ -21,7 +21,7 @@ const sharedAccessSchema = new Schema({
         // for my futureSelf this is more storage and performance efficient and easy to update 
         // By using an array for sharedWith, the database structure is cleaner, queries are faster, and updating permissions is easier.
         {
-            user: {
+            userId: {
                 type: Schema.Types.ObjectId,
                 ref: "User",
                 required: true
@@ -32,7 +32,11 @@ const sharedAccessSchema = new Schema({
                 default: "view"
             }
         }
-    ]
+    ],
+    isPublic:{
+        type:Boolean,
+        default:false
+    }
 
 },{timestamps:true})
 
