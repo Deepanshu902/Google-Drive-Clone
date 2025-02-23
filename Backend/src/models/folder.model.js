@@ -21,7 +21,21 @@ const folderSchema = new Schema({
     isDeleted: {
         type: Boolean,
         default: false
-    }
+    },
+    // Thanks chatgpt for improving the model
+    totalSize: { // ✅ NEW: Track folder size
+        type: Number,
+        default: 0
+    },
+    isShared: { // ✅ NEW: Track if folder is shared
+        type: Boolean,
+        default: false
+    },
+    sharedWith: [{ // ✅ NEW: Store users with access
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    }]
+    
 },{timestamps:true})
 
 
