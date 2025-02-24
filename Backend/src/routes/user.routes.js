@@ -19,9 +19,9 @@ router.post("/register",registerUser)
 
 router.post("/login",loginUser)
 
-router.get("/logout",verifyJWT,logoutUser)
+router.post("/logout",verifyJWT,logoutUser)
 
-router.post("/update-account-details",verifyJWT,updateAccountDetails)
+router.patch("/update-account-details",verifyJWT,updateAccountDetails)
 
 router.get("/current-user",verifyJWT,getCurrentUser)
 
