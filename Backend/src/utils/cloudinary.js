@@ -1,24 +1,24 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
 
-// didn't understand a bit
-// Configuration
 cloudinary.config({ 
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-    api_key: process.env.CLOUDINARY_API_KEY, 
-    api_secret: process.env.CLOUDINARY_API_SECRET // Click 'View API Keys' above to copy your API secret
+    cloud_name: 'dj6kl9cp3', 
+    api_key: '568328796182512', 
+    api_secret: 'TlocSA0SC4oElZyvqsKWyZv1phw' 
 });
 
 const uploadOnCloudinary = async (localFilePath,oldImagePublicId = null) => {
     try {
-        if (!localFilePath) return null;
+        if (!localFilePath) {
+            console.log("🚨 No file path provided to Cloudinary upload function")
+            return null
+        };
 
         // Upload the file to Cloudinary
         const response = await cloudinary.uploader.upload(localFilePath, {
             resource_type: "auto", // Auto-detect the file type (image, video, etc.)
-            folder: "drive-clone", 
+             folder: "google-drive-clone"
         });
-
 
         if (oldImagePublicId) { // delete old file 
             const deleteResponse = await cloudinary.uploader.destroy(oldImagePublicId);

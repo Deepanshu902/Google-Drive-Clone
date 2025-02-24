@@ -1,5 +1,6 @@
 import {uploadOnCloudinary,deleteCloudinaryFile} from "../utils/cloudinary.js"
-import File from "../models/file.model.js"
+import {File} from "../models/file.model.js"
+import {User} from "../models/user.model.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
@@ -7,7 +8,7 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 
 const uploadFile = asyncHandler(async(req,res)=>{
     const file = req.file
-
+ 
     if(!file){
          throw new ApiError(401,"Upload file")
     }
@@ -27,6 +28,7 @@ const uploadFile = asyncHandler(async(req,res)=>{
             filename: req.file.filename,
             fileUrl: response.secure_url,
             cloudinaryPublicId: response.public_id,
+            contentType:req.file.mimetype,
             size:file.size,
             userId: req.user._id,
          })
@@ -59,6 +61,11 @@ const deleteFile = asyncHandler(async(req,res)=>{
 
     if (!file) {
         throw new ApiError(404, "File not found");
+    }
+
+    const user = await User.findById(file.userId);
+    if (!user) {
+        throw new ApiError(404, "User not found");
     }
 
     const deleteResponse = await deleteCloudinaryFile(file.cloudinaryPublicId)
