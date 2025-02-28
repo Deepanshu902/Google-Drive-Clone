@@ -31,4 +31,8 @@ app.use("/api/v1/folder",folderRouter)
 app.use("/api/v1/shared",SharedAccessRouter)
 app.use("/api/v1/file",fileRouter)
 
+app.get("/healthz", (req, res) => {
+    res.status(200).json({ status: "OK" });
+  });
+
 export {app}  
