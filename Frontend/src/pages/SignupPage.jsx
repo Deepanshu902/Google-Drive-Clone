@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { loginUser } from "../services/authService";
+import { registerUser } from "../services/authService";
 import { useDispatch } from "react-redux";
 import { login } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+const SignupPage = () => {
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -17,11 +17,11 @@ const Login = () => {
     e.preventDefault();
     setError(null);
     try {
-      const data = await loginUser(formData);
+      const data = await registerUser(formData);
       dispatch(login(data));
       navigate("/dashboard");
     } catch (err) {
-      setError("Invalid email or password.");
+      setError("Signup failed. Try again.");
     }
   };
 
@@ -33,9 +33,20 @@ const Login = () => {
         transition={{ duration: 0.8 }}
         className="bg-gray-900 p-8 rounded-lg shadow-md w-full max-w-md"
       >
-        <h2 className="text-3xl font-bold mb-6 text-center text-blue-500">Login to Cloud Drive</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center text-blue-500">Create an Account</h2>
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
         <form onSubmit={onSubmit}>
+          <div className="mb-4">
+            <label className="block mb-2 text-gray-300">Name</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={onChange}
+              className="w-full bg-gray-800 border border-gray-700 p-3 rounded text-white focus:border-blue-500"
+              required
+            />
+          </div>
           <div className="mb-4">
             <label className="block mb-2 text-gray-300">Email</label>
             <input
@@ -62,13 +73,13 @@ const Login = () => {
             type="submit"
             className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-bold transition hover:bg-blue-500"
           >
-            Login
+            Sign Up
           </button>
         </form>
         <p className="mt-4 text-center text-gray-400">
-          Don’t have an account?{" "}
-          <a href="/signup" className="text-blue-400 hover:underline">
-            Sign Up
+          Already have an account?{" "}
+          <a href="/login" className="text-blue-400 hover:underline">
+            Login
           </a>
         </p>
       </motion.div>
@@ -76,4 +87,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignupPage;

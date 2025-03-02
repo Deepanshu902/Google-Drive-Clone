@@ -1,12 +1,12 @@
 import Dashboard from "./Dashboard"
 import LandingPage from "./LandingPage"
 import Login from "./Login"
-import Register from "./Register"
+import SignupPage from "./SignupPage"
 
 
 export {
     Dashboard,
     LandingPage,
     Login,
-    Register
+    SignupPage
 }

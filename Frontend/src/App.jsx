@@ -4,7 +4,7 @@ import {
   Dashboard,
   LandingPage,
   Login,
-  Register
+  SignupPage
 } from "./pages/index"
 import Navbar from "./components/Navbar"
 
@@ -16,7 +16,7 @@ function App() {
         <Route path="/" element={<LandingPage/>}/>
         <Route path="/dashboard" element={<Dashboard/>}/>
         <Route path="/login" element={<Login/>}/>
-        <Route path="/register" element={<Register/>}/>
+        <Route path="/signup" element={<SignupPage/>}/>
       </Routes>
     </Router>
   );
