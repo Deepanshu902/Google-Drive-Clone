@@ -1,6 +1,12 @@
 import multer from "multer";
 
-// Define Storage
-const storage = multer.memoryStorage();
+const storage = multer.memoryStorage(); // ✅ Store file in memory instead of disk
 
-export const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+    if (!file) {
+        return cb(new Error("No file uploaded"), false);
+    }
+    cb(null, true);
+};
+
+export const upload = multer({ storage, fileFilter });

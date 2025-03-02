@@ -22,10 +22,13 @@ const uploadFile = asyncHandler(async(req,res)=>{
         throw new ApiError(403, "Storage limit exceeded")
     }
 
+    const fileExtension = file.mimetype.split("/")[1]; // Extract file extension
+    const generatedFilename = `file_${Date.now()}.${fileExtension}`; // Generate a fallback filename
+
     const response = await uploadOnCloudinary(file.buffer)
 
     const newFile = await File.create({
-            filename: req.file.filename,
+            filename: file.originalname || generatedFilename,
             fileUrl: response.secure_url,
             cloudinaryPublicId: response.public_id,
             contentType:req.file.mimetype,
