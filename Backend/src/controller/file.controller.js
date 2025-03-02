@@ -22,7 +22,7 @@ const uploadFile = asyncHandler(async(req,res)=>{
         throw new ApiError(403, "Storage limit exceeded")
     }
 
-    const response = await uploadOnCloudinary(file.path)
+    const response = await uploadOnCloudinary(file.buffer)
 
     const newFile = await File.create({
             filename: req.file.filename,
