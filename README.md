@@ -7,7 +7,7 @@ View API documentation here: [Postman Documentation](https://documenter.getpostm
 <br />
 Render API here: [Render](https://google-drive-clone-0z9o.onrender.com)
 <br/>
-Frontend is Live now: [vercel](google-drive-clone-virid.vercel.app)
+Frontend is Live now: [vercel](https://google-drive-clone-virid.vercel.app)
 
 ## 🛠 Technologies Used
 - Node.js
