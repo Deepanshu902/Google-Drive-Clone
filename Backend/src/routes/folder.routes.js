@@ -16,7 +16,7 @@ router.post("/createFolder",createFolder)
 
 router.patch("/:folderId/rename",renameFolder)
 
-router.patch("/:folderId",deleteFolder)
+router.delete("/:folderId",deleteFolder)
 
 router.get("/list",allFolder)
 
