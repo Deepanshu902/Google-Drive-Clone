@@ -17,9 +17,19 @@ const uploadFile = async (fileData) => {
 
 // Get all files
 const getFiles = async () => {
+  try {
     const response = await axios.get(`${API_URL}file`, { withCredentials: true });
-    console.log("Files API Response:", response.data);
-    return response.data?.data || [];
+    const files = response.data?.data;
+
+    // Safely return array or empty array
+    if (Array.isArray(files)) return files;
+    
+    // If backend returns { message: "No files found" }
+    return [];
+  } catch (error) {
+    console.error("Error fetching files:", error);
+    return []; // return empty array if request fails
+  }
 };
 
 // Delete a file
