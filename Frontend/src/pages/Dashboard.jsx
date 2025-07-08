@@ -7,6 +7,8 @@ import { getFiles } from "../services/fileService";
 import { setFiles } from "../store/fileSlice";
 import FileUpload from "../components/FileUpload";
 import FileList from "../components/FileList";
+import { useNavigate } from "react-router-dom";
+
 
 const Dashboard = () => {
   const dispatch = useDispatch();
