@@ -20,19 +20,27 @@ const Dashboard = () => {
         setLoading(true);
         setError(null);
         
-        // Get current user
-        const userResponse = await getCurrentUser();
-        if (userResponse.data) {
-          dispatch(login(userResponse.data));
+        // Only fetch user data if not already in Redux
+        if (!userData) {
+          const userResponse = await getCurrentUser();
+          if (userResponse.data) {
+            dispatch(login(userResponse.data));
+          }
+          // Add delay to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
-  
-        // Get storage info
-        const storageResponse = await getStorage();
-        if (storageResponse.data) {
-          dispatch(setStorage(storageResponse.data));
+
+        // Only fetch storage if not already in Redux
+        if (!storage) {
+          const storageResponse = await getStorage();
+          if (storageResponse.data) {
+            dispatch(setStorage(storageResponse.data));
+          }
+          // Add delay to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
-  
-        // Get files
+
+        // Always fetch files but with delay
         const filesResponse = await getFiles();
         dispatch(setFiles(filesResponse));
         
@@ -45,7 +53,7 @@ const Dashboard = () => {
     }
     
     fetchData();
-  }, [dispatch]);
+  }, [dispatch]); // Remove userData and storage from dependencies to avoid loops
 
   // Show loading state
   if (loading) {
