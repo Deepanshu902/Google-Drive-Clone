@@ -34,7 +34,7 @@ const Dashboard = () => {
   
         // Get files
         const filesResponse = await getFiles();
-        dispatch(setFiles(filesResponse || []));
+        dispatch(setFiles(filesResponse));
         
       } catch (error) {
         console.error("Error fetching dashboard data:", error);

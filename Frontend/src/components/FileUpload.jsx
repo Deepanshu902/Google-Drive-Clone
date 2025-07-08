@@ -15,19 +15,20 @@ const FileUpload = () => {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) {
-      setUploadMessage("Please select a file.");
-      return;
-    }
+  if (!selectedFile) {
+    setUploadMessage("Please select a file.");
+    return;
+  }
 
-    try {
-      const uploadedFile = await uploadFile(selectedFile);
-      dispatch(addFile(uploadedFile.data)); // ✅ Add to Redux store
-      setUploadMessage("File uploaded successfully!");
-    } catch (error) {
-      setUploadMessage("File upload failed.");
-    }
-  };
+  try {
+    const uploadedFile = await uploadFile(selectedFile);
+    dispatch(addFile(uploadedFile)); // Remove .data here
+    setUploadMessage("File uploaded successfully!");
+    setSelectedFile(null); // Clear the file input
+  } catch (error) {
+    setUploadMessage("File upload failed.");
+  }
+};
 
   return (
     <div className="p-4 bg-gray-900 rounded-lg shadow-md text-white text-center">
