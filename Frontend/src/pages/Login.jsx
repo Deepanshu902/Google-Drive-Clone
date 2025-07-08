@@ -50,6 +50,8 @@ const Login = () => {
               name="email"
               value={formData.email}
               onChange={onChange}
+              pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
+              title="Only Gmail addresses allowed"
               className="w-full bg-gray-800 border border-gray-700 p-3 rounded text-white focus:border-blue-500"
               required
               disabled={isLoading}

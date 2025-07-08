@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentUser, getStorage } from "../services/authService";
-import { login, setStorage } from "../store/authSlice";
+import { login, setStorage, logout } from "../store/authSlice";
 import { getFiles } from "../services/fileService";
 import { setFiles } from "../store/fileSlice";
 import FileUpload from "../components/FileUpload";
@@ -10,9 +10,16 @@ import FileList from "../components/FileList";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { userData, storage } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const handleLogout = () => {
+  dispatch(logout());
+  navigate("/login");
+};
+
 
   useEffect(() => {
     async function fetchData() {
@@ -98,6 +105,12 @@ const Dashboard = () => {
       >
         Cloud Drive Dashboard
       </motion.h1>
+
+      <button 
+        onClick={handleLogout} 
+        className="bg-red-600 px-4 py-2 rounded hover:bg-red-500 text-white self-end mb-4" >
+          Logout
+      </button>
 
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }} 
