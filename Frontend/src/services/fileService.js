@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Upload a file
 const uploadFile = async (fileData) => {
     const formData = new FormData();
-    formData.append("file", fileData); 
+    formData.append("file", fileData,fileData.name); 
 
     const response = await axios.post(`${API_URL}file/upload`, formData, {
         withCredentials: true,
