@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentUser, getStorage } from "../services/authService";
@@ -11,26 +11,70 @@ import FileList from "../components/FileList";
 const Dashboard = () => {
   const dispatch = useDispatch();
   const { userData, storage } = useSelector((state) => state.auth);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
+        setError(null);
+        
+        // Get current user
         const userResponse = await getCurrentUser();
-        dispatch(login(userResponse.data));
+        if (userResponse.data) {
+          dispatch(login(userResponse.data));
+        }
   
+        // Get storage info
         const storageResponse = await getStorage();
-        dispatch(setStorage(storageResponse.data));
+        if (storageResponse.data) {
+          dispatch(setStorage(storageResponse.data));
+        }
   
-        const filesResponse = await getFiles(); // ✅ Fetch user files
-        console.log("Files received before dispatch:", filesResponse); // ✅ Debug log
-  
-        dispatch(setFiles(filesResponse)); // ✅ Ensure correct data is sent to Redux
+        // Get files
+        const filesResponse = await getFiles();
+        dispatch(setFiles(filesResponse || []));
+        
       } catch (error) {
-        console.error("Error fetching dashboard data", error);
+        console.error("Error fetching dashboard data:", error);
+        setError("Failed to load dashboard data. Please refresh the page.");
+      } finally {
+        setLoading(false);
       }
     }
+    
     fetchData();
   }, [dispatch]);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-400">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-500"
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const totalStorageGB = storage?.totalStorage ? (parseInt(storage.totalStorage) / (1024 ** 3)).toFixed(2) : 0;
   const usedStorageGB = storage?.usedStorage ? (parseInt(storage.usedStorage) / (1024 ** 3)).toFixed(2) : 0;
@@ -38,11 +82,21 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-black text-white p-6 flex flex-col items-center">
-      <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-4xl font-bold text-blue-500 mb-6">
+      <motion.h1 
+        initial={{ opacity: 0, y: -20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.8 }} 
+        className="text-4xl font-bold text-blue-500 mb-6"
+      >
         Cloud Drive Dashboard
       </motion.h1>
 
-      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.3 }} className="bg-gray-900 p-6 rounded-lg shadow-md w-full max-w-2xl text-center">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }} 
+        animate={{ opacity: 1, scale: 1 }} 
+        transition={{ duration: 0.8, delay: 0.3 }} 
+        className="bg-gray-900 p-6 rounded-lg shadow-md w-full max-w-2xl text-center"
+      >
         {userData ? (
           <>
             <h2 className="text-2xl font-semibold">Welcome, {userData.name}!</h2>
@@ -54,7 +108,12 @@ const Dashboard = () => {
       </motion.div>
 
       {storage && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.5 }} className="bg-gray-900 p-6 rounded-lg shadow-md w-full max-w-2xl mt-6 text-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ duration: 0.8, delay: 0.5 }} 
+          className="bg-gray-900 p-6 rounded-lg shadow-md w-full max-w-2xl mt-6 text-center"
+        >
           <h2 className="text-xl font-semibold text-gray-300">Storage Usage</h2>
           <p className="text-gray-400 mt-2">
             <span className="font-bold text-blue-400">{usedStorageGB} GB</span> / <span className="text-gray-400">{totalStorageGB} GB</span>
@@ -65,7 +124,12 @@ const Dashboard = () => {
         </motion.div>
       )}
 
-      <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.7 }} className="bg-gray-900 p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.8, delay: 0.7 }} 
+        className="bg-gray-900 p-6 rounded-lg shadow-md w-full max-w-2xl mt-6"
+      >
         <h2 className="text-xl font-semibold text-gray-300 text-center">Upload Files</h2>
         <FileUpload />
       </motion.div>

@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 const SignupPage = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -16,12 +17,18 @@ const SignupPage = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
+    
     try {
-      const data = await registerUser(formData);
-      dispatch(login(data));
+      const response = await registerUser(formData);
+      // Fix: dispatch the user data, not the entire response
+      dispatch(login(response.data));
       navigate("/dashboard");
     } catch (err) {
+      console.error("Signup error:", err);
       setError("Signup failed. Try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -45,6 +52,7 @@ const SignupPage = () => {
               onChange={onChange}
               className="w-full bg-gray-800 border border-gray-700 p-3 rounded text-white focus:border-blue-500"
               required
+              disabled={isLoading}
             />
           </div>
           <div className="mb-4">
@@ -56,6 +64,7 @@ const SignupPage = () => {
               onChange={onChange}
               className="w-full bg-gray-800 border border-gray-700 p-3 rounded text-white focus:border-blue-500"
               required
+              disabled={isLoading}
             />
           </div>
           <div className="mb-6">
@@ -67,13 +76,15 @@ const SignupPage = () => {
               onChange={onChange}
               className="w-full bg-gray-800 border border-gray-700 p-3 rounded text-white focus:border-blue-500"
               required
+              disabled={isLoading}
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-bold transition hover:bg-blue-500"
+            disabled={isLoading}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-bold transition hover:bg-blue-500 disabled:opacity-50"
           >
-            Sign Up
+            {isLoading ? "Creating account..." : "Sign Up"}
           </button>
         </form>
         <p className="mt-4 text-center text-gray-400">
