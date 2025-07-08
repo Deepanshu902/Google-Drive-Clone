@@ -12,7 +12,7 @@ const uploadFile = async (fileData) => {
         headers: { "Content-Type": "multipart/form-data" },
     });
 
-    return response.data;
+    return response.data?.data;
 };
 
 // Get all files
