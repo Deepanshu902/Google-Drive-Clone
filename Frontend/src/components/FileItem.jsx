@@ -49,6 +49,7 @@ const FileItem = ({ file }) => {
       <div className="flex items-center gap-2">
         {/* --- DOWNLOAD BUTTON --- */}
         <a
+          target="_blank"
           href={file.fileUrl}
           download={file.filename} // Suggests a filename to the browser
           className="p-2 rounded-full text-gray-300 hover:bg-blue-600 hover:text-white transition-colors"
