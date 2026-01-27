@@ -24,4 +24,6 @@ RUN npm ci --only=production
 # Copy app files from build stage
 COPY --from=build /app /app
 
+EXPOSE 8000
+
 CMD ["node", "src/index.js"]
