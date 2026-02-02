@@ -1,20 +1,35 @@
-// src/components/FileItem.jsx
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { useDispatch } from "react-redux";
 import { deleteFile } from "../services/fileService";
 import { removeFile } from "../store/fileSlice";
-import { useAnimation } from "motion/react";
 
-// Import your new animated icon components
-import AnimatedDownloadIcon from "./AnimatedDownloadIcon";
-import AnimatedDeleteIcon from "./AnimatedDeleteIcon";
-
+// File type icons
+const getFileIcon = (contentType) => {
+  if (contentType?.startsWith("image/")) {
+    return (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    );
+  }
+  if (contentType?.includes("pdf")) {
+    return (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+      </svg>
+    );
+  }
+  return (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  );
+};
 
 const FileItem = ({ file }) => {
   const dispatch = useDispatch();
-
-  // Create separate animation controls for each button
-  const downloadControls = useAnimation();
-  const deleteControls = useAnimation();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDownload = async () => {
     try {
@@ -35,60 +50,100 @@ const FileItem = ({ file }) => {
   };
 
   const handleDelete = async () => {
+    if (!window.confirm(`Delete "${file.filename}"?`)) return;
+    
     try {
+      setIsDeleting(true);
       await deleteFile(file._id);
       dispatch(removeFile(file._id));
     } catch (error) {
       console.error("Failed to delete file:", error);
+      setIsDeleting(false);
     }
   };
 
+  const formatFileSize = (bytes) => {
+    if (!bytes) return "0 B";
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
+  };
+
   return (
-    <li className="flex justify-between items-center bg-gray-800 p-3 rounded-lg mt-2 transition-all hover:bg-gray-700/50">
-      <div className="flex items-center gap-4">
-        {file.contentType && file.contentType.startsWith("image/") ? (
-          <a href={file.fileUrl} target="_blank" rel="noopener noreferrer" title="View image in new tab">
-            <img src={file.fileUrl} alt={file.filename} className="w-12 h-12 rounded-lg object-cover" />
-          </a>
-        ) : (
-            <div className="w-12 h-12 rounded-lg bg-gray-700 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: isDeleting ? 0.5 : 1, y: 0 }}
+      exit={{ opacity: 0, x: -100 }}
+      className={`group flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all duration-200 ${
+        isDeleting ? "pointer-events-none" : ""
+      }`}
+    >
+      <div className="flex items-center gap-4 flex-1 min-w-0">
+        {/* File Thumbnail/Icon */}
+        <div className="flex-shrink-0">
+          {file.contentType?.startsWith("image/") ? (
+            <div className="w-12 h-12 rounded-lg overflow-hidden bg-slate-200 border border-slate-300">
+              <img 
+                src={file.fileUrl} 
+                alt={file.filename} 
+                className="w-full h-full object-cover"
+              />
             </div>
-        )}
-        <a href={file.fileUrl} target="_blank" rel="noopener noreferrer" title="View image in new tab">
-        <span className="font-medium text-white">
+          ) : (
+            <div className="w-12 h-12 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600">
+              {getFileIcon(file.contentType)}
+            </div>
+          )}
+        </div>
+
+        {/* File Info */}
+        <div className="flex-1 min-w-0">
+          <h3 className="font-medium text-slate-800 truncate">
             {file.filename || "Unnamed File"}
-        </span>
-        </a>
-        
+          </h3>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {formatFileSize(file.size)}
+          </p>
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        {/* --- ANIMATED DOWNLOAD BUTTON --- */}
-        <button
+      {/* Action Buttons */}
+      <div className="flex items-center gap-2 ml-4">
+        {/* Download Button */}
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
           onClick={handleDownload}
-          className="p-2 rounded-full text-gray-300 hover:bg-blue-600 hover:text-white transition-colors"
-          aria-label="Download file"
+          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
           title="Download"
-          onMouseEnter={() => downloadControls.start("animate")}
-          onMouseLeave={() => downloadControls.start("normal")}
         >
-          <AnimatedDownloadIcon animate={downloadControls} />
-        </button>
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+        </motion.button>
 
-        {/* --- ANIMATED DELETE BUTTON --- */}
-        <button
-            onClick={handleDelete}
-            className="p-2 rounded-full text-gray-300 hover:bg-red-600 hover:text-white transition-colors"
-            aria-label="Delete file"
-            title="Delete"
-            onMouseEnter={() => deleteControls.start("animate")}
-            onMouseLeave={() => deleteControls.start("normal")}
+        {/* Delete Button */}
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50"
+          title="Delete"
         >
-          <AnimatedDeleteIcon animate={deleteControls} />
-        </button>
+          {isDeleting ? (
+            <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          )}
+        </motion.button>
       </div>
-    </li>
+    </motion.div>
   );
 };
 
