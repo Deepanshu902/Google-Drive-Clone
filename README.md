@@ -5,7 +5,7 @@ This is the backend API for a Google Drive clone, allowing users to authenticate
 ## 🚀 Live API Documentation
 View API documentation here: [Postman Documentation](https://documenter.getpostman.com/view/40572133/2sAYdhKqBc)
 <br />
-Render API here: [Render](https://google-drive-clone-0z9o.onrender.com)
+AWS API here: [AWS](https://term-urw-sport-radio.trycloudflare.com)
 <br/>
 Frontend is Live now: [vercel](https://google-drive-clone-virid.vercel.app)
 
@@ -16,7 +16,7 @@ Frontend is Live now: [vercel](https://google-drive-clone-virid.vercel.app)
 - JWT Authentication
 - Multer (for file uploads)
 - Cloudinary (for cloud storage)
-- Render (for deployment)
+- AWS (for deployment)
 
 ## 📌 Features
 - **User Authentication:** Secure registration and login with JWT.
