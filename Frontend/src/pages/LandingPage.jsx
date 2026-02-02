@@ -1,25 +1,24 @@
-// src/pages/LandingPage.jsx
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 text-slate-800">
       {/* Hero Section */}
       <motion.h1
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
-        className="text-5xl md:text-6xl font-extrabold text-center text-gray-200"
+        className="text-5xl md:text-6xl font-extrabold text-center"
       >
-        Welcome to <span className="text-blue-500">Cloud Drive</span>
+        Welcome to <span className="bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">Cloud Drive</span>
       </motion.h1>
 
       <motion.p
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, delay: 0.3 }}
-        className="mt-4 text-lg md:text-xl text-center max-w-2xl text-gray-400"
+        className="mt-4 text-lg md:text-xl text-center max-w-2xl text-slate-600"
       >
         Your secure and private cloud storage. Store, manage, and share files effortlessly.
       </motion.p>
@@ -33,13 +32,13 @@ const LandingPage = () => {
       >
         <Link
           to="/signup"
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-bold transition hover:bg-blue-500"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-bold transition hover:bg-blue-700 shadow-lg shadow-blue-500/30"
         >
           Get Started
         </Link>
         <Link
           to="/login"
-          className="border-2 border-gray-500 px-6 py-3 rounded-lg text-lg font-bold transition hover:bg-gray-800"
+          className="border-2 border-slate-300 bg-white px-6 py-3 rounded-lg text-lg font-bold transition hover:bg-slate-50 hover:border-slate-400 text-slate-700"
         >
           Login
         </Link>
@@ -63,10 +62,10 @@ const LandingPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 1 + index * 0.2 }}
-            className="bg-gray-900 text-gray-300 p-6 rounded-lg shadow-md hover:bg-gray-800 transition"
+            className="bg-white text-slate-700 p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-200 transition-all"
           >
-            <h3 className="text-xl font-bold text-white">{item.title}</h3>
-            <p className="mt-2 text-gray-400">{item.desc}</p>
+            <h3 className="text-xl font-bold text-slate-800">{item.title}</h3>
+            <p className="mt-2 text-slate-600">{item.desc}</p>
           </motion.div>
         ))}
       </motion.div>
@@ -75,21 +74,21 @@ const LandingPage = () => {
       <motion.img
         src="https://cdn-icons-png.flaticon.com/512/1160/1160358.png"
         alt="Cloud Icon"
-        className="absolute top-16 left-10 w-16 opacity-20"
+        className="absolute top-16 left-10 w-16 opacity-10"
         animate={{ y: [0, 20, 0] }}
         transition={{ duration: 3, repeat: Infinity }}
       />
       <motion.img
         src="https://cdn-icons-png.flaticon.com/512/1160/1160371.png"
         alt="Cloud Icon"
-        className="absolute top-24 right-10 w-20 opacity-20"
+        className="absolute top-24 right-10 w-20 opacity-10"
         animate={{ y: [0, 15, 0] }}
         transition={{ duration: 2.5, repeat: Infinity }}
       />
       <motion.img
         src="https://cdn-icons-png.flaticon.com/512/1160/1160377.png"
         alt="Cloud Icon"
-        className="absolute bottom-16 left-24 w-24 opacity-20"
+        className="absolute bottom-16 left-24 w-24 opacity-10"
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
       />
@@ -99,14 +98,14 @@ const LandingPage = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.5, delay: 1.5 }}
-        className="w-full bg-gray-900 text-gray-400 text-center py-6 mt-16"
+        className="w-full bg-white border-t border-slate-200 text-slate-600 text-center py-6 mt-16"
       >
         <div className="container mx-auto">
           <p>© {new Date().getFullYear()} Cloud Drive. All rights reserved.</p>
           <div className="flex justify-center space-x-6 mt-3">
-            <Link to="/about" className="hover:text-white">About</Link>
-            <Link to="/privacy" className="hover:text-white">Privacy Policy</Link>
-            <Link to="/contact" className="hover:text-white">Contact</Link>
+            <Link to="/about" className="hover:text-blue-600 transition-colors">About</Link>
+            <Link to="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link>
+            <Link to="/contact" className="hover:text-blue-600 transition-colors">Contact</Link>
           </div>
         </div>
       </motion.footer>
