@@ -74,7 +74,7 @@ const FileItem = ({ file }) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: isDeleting ? 0.5 : 1, y: 0 }}
       exit={{ opacity: 0, x: -100 }}
-      className={`group flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all duration-200 ${
+      className={`group flex items-center justify-between p-4 bg-white hover:bg-slate-50 border border-black/5 rounded-xl transition-all duration-200 ${
         isDeleting ? "pointer-events-none" : ""
       }`}
     >
@@ -82,7 +82,7 @@ const FileItem = ({ file }) => {
         {/* File Thumbnail/Icon */}
         <div className="flex-shrink-0">
           {file.contentType?.startsWith("image/") ? (
-            <div className="w-12 h-12 rounded-lg overflow-hidden bg-slate-200 border border-slate-300">
+            <div className="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 border border-black/5">
               <img 
                 src={file.fileUrl} 
                 alt={file.filename} 
@@ -90,7 +90,7 @@ const FileItem = ({ file }) => {
               />
             </div>
           ) : (
-            <div className="w-12 h-12 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600">
+            <div className="w-12 h-12 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
               {getFileIcon(file.contentType)}
             </div>
           )}
@@ -98,10 +98,10 @@ const FileItem = ({ file }) => {
 
         {/* File Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-slate-800 truncate">
+          <h3 className="text-[15px] font-medium text-black truncate">
             {file.filename || "Unnamed File"}
           </h3>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-[13px] text-black/50 mt-0.5">
             {formatFileSize(file.size)}
           </p>
         </div>
@@ -111,10 +111,10 @@ const FileItem = ({ file }) => {
       <div className="flex items-center gap-2 ml-4">
         {/* Download Button */}
         <motion.button
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleDownload}
-          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+          className="p-2 text-black/40 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
           title="Download"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -124,11 +124,11 @@ const FileItem = ({ file }) => {
 
         {/* Delete Button */}
         <motion.button
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleDelete}
           disabled={isDeleting}
-          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50"
+          className="p-2 text-black/40 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50"
           title="Delete"
         >
           {isDeleting ? (
