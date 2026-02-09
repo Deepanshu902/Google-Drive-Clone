@@ -4,17 +4,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCurrentUser, getStorage, logoutUser } from "../services/authService";
 import { login, setStorage, logout } from "../store/authSlice";
 import { getFiles } from "../services/fileService";
+import { getFolders } from "../services/folderService";
 import { setFiles } from "../store/fileSlice";
+import { setFolders } from "../store/folderSlice";
 import FileUpload from "../components/FileUpload";
 import FileList from "../components/FileList";
+import FolderItem from "../components/FolderItem";
+import CreateFolderModal from "../components/CreateFolderModal";
+import Breadcrumb from "../components/Breadcrumb";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { userData, storage } = useSelector((state) => state.auth);
+  const { files } = useSelector((state) => state.file);
+  const { folders, currentFolderId } = useSelector((state) => state.folder);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showCreateFolder, setShowCreateFolder] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -50,8 +58,14 @@ const Dashboard = () => {
           await new Promise(resolve => setTimeout(resolve, 200));
         }
         
-        const filesResponse = await getFiles();
+        // Fetch files and folders
+        const [filesResponse, foldersResponse] = await Promise.all([
+          getFiles(),
+          getFolders()
+        ]);
+        
         dispatch(setFiles(filesResponse));
+        dispatch(setFolders(foldersResponse));
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         setError("Failed to load dashboard data. Please refresh the page.");
@@ -61,6 +75,15 @@ const Dashboard = () => {
     }
     fetchData();
   }, [dispatch]);
+
+  // Filter folders and files for current directory
+  const currentFolders = folders.filter(
+    folder => (folder.parentFolderId || null) === currentFolderId && !folder.isDeleted
+  );
+  
+  const currentFiles = files.filter(
+    file => (file.folderId || null) === currentFolderId
+  );
 
   if (loading) {
     return (
@@ -143,21 +166,58 @@ const Dashboard = () => {
       <main className="max-w-[1200px] mx-auto px-6 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* Main Column - Upload & Files */}
+          {/* Main Column - Folders & Files */}
           <div className="lg:col-span-2 space-y-8">
             
+            {/* Breadcrumb & New Folder Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="flex items-center justify-between"
+            >
+              <Breadcrumb />
+              <button
+                onClick={() => setShowCreateFolder(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-xl text-[14px] font-medium text-black hover:bg-slate-50 transition-all"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                New Folder
+              </button>
+            </motion.div>
+
+            {/* Folders Section */}
+            {currentFolders.length > 0 && (
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <h2 className="text-[17px] font-semibold text-black mb-3">
+                  Folders
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {currentFolders.map((folder) => (
+                    <FolderItem key={folder._id} folder={folder} />
+                  ))}
+                </div>
+              </motion.section>
+            )}
+
             {/* Upload Section */}
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
             >
               <div className="mb-4">
                 <h2 className="text-[28px] font-semibold text-black -tracking-[0.015em]">
                   Upload files
                 </h2>
                 <p className="text-[14px] text-black/60 mt-1">
-                  Add new files to your storage
+                  {currentFolderId ? "Upload to current folder" : "Add new files to your storage"}
                 </p>
               </div>
               <FileUpload />
@@ -167,14 +227,14 @@ const Dashboard = () => {
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
             >
               <div className="mb-4">
                 <h2 className="text-[28px] font-semibold text-black -tracking-[0.015em]">
-                  Your files
+                  Files
                 </h2>
                 <p className="text-[14px] text-black/60 mt-1">
-                  Manage and organize your uploads
+                  {currentFiles.length} {currentFiles.length === 1 ? 'file' : 'files'}
                 </p>
               </div>
               <FileList />
@@ -186,7 +246,7 @@ const Dashboard = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
               className="sticky top-24 bg-slate-50 rounded-2xl border border-black/5 p-6"
             >
               <h3 className="text-[17px] font-semibold text-black mb-6 -tracking-[0.022em]">
@@ -238,6 +298,12 @@ const Dashboard = () => {
 
         </div>
       </main>
+
+      {/* Create Folder Modal */}
+      <CreateFolderModal 
+        isOpen={showCreateFolder} 
+        onClose={() => setShowCreateFolder(false)} 
+      />
     </div>
   );
 };

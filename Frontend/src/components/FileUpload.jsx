@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { uploadFile } from "../services/fileService";
 import { addFile } from "../store/fileSlice";
 
@@ -11,6 +11,7 @@ const FileUpload = () => {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
+  const { currentFolderId } = useSelector((state) => state.folder); // Get current folder
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -50,7 +51,7 @@ const FileUpload = () => {
     try {
       setIsUploading(true);
       setUploadMessage("");
-      const uploadedFile = await uploadFile(selectedFile);
+      const uploadedFile = await uploadFile(selectedFile, currentFolderId); // Pass current folder
       dispatch(addFile(uploadedFile));
       setUploadMessage("File uploaded successfully");
       setSelectedFile(null);
