@@ -1,6 +1,7 @@
 import {uploadOnCloudinary,deleteCloudinaryFile} from "../utils/cloudinary.js"
 import {File} from "../models/file.model.js"
 import {User} from "../models/user.model.js"
+import {Folder} from "../models/folder.model.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
@@ -8,6 +9,7 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 
 const uploadFile = asyncHandler(async(req,res)=>{
     const file = req.file
+    const { folderId } = req.body;
  
     if(!file){
          throw new ApiError(401,"Upload file")
@@ -34,6 +36,7 @@ const uploadFile = asyncHandler(async(req,res)=>{
             contentType:req.file.mimetype,
             size:file.size,
             userId: req.user._id,
+            folderId: folderId || null,
          })
 
     if(!newFile){
@@ -90,9 +93,45 @@ const deleteFile = asyncHandler(async(req,res)=>{
     );
 })
 
+const moveFile = asyncHandler(async(req, res) => {
+    const { fileId } = req.params;
+    const { folderId } = req.body; // null for root, or folder ID
+
+    const file = await File.findById(fileId);
+
+    if (!file) {
+        throw new ApiError(404, "File not found");
+    }
+
+    // Security: Check if user owns the file
+    if (file.userId.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You don't have permission to move this file");
+    }
+
+    // If moving to a folder, verify it exists and user owns it
+    if (folderId) {
+        const folder = await Folder.findById(folderId);
+        if (!folder) {
+            throw new ApiError(404, "Destination folder not found");
+        }
+        if (folder.userId.toString() !== req.user._id.toString()) {
+            throw new ApiError(403, "You don't have permission to move to this folder");
+        }
+    }
+
+    // Update file's folder
+    file.folderId = folderId || null;
+    await file.save();
+
+    return res.status(200).json(
+        new ApiResponse(200, file, "File moved successfully")
+    );
+});
+
 
 export {
     uploadFile,
     getFiles,
-    deleteFile
+    deleteFile,
+    moveFile
 }

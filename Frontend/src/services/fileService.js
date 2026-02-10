@@ -7,7 +7,7 @@ const uploadFile = async (fileData, folderId = null) => {
     const formData = new FormData();
     formData.append("file", fileData, fileData.name);
     
-    // Add folderId if provided
+    // Add folderId if provided (important: send as string or it won't work)
     if (folderId) {
         formData.append("folderId", folderId);
     }
@@ -43,4 +43,13 @@ const deleteFile = async (fileId) => {
     return response.data;
 };
 
-export { uploadFile, getFiles, deleteFile };
+const moveFile = async (fileId, folderId = null) => {
+    const response = await axios.patch(
+        `${API_URL}file/${fileId}/move`,
+        { folderId },
+        { withCredentials: true }
+    );
+    return response.data?.data;
+};
+
+export { uploadFile, getFiles, deleteFile,moveFile };

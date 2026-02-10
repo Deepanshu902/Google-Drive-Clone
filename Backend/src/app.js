@@ -8,7 +8,7 @@ const app = express()
 
 const limiter = rateLimit({
 	windowMs: 10 * 60 * 1000, // 10 minutes
-	limit: 20, // Limit each IP is 20
+	limit: 80, // Limit each IP is 20
 	standardHeaders: 'draft-8', 
 	legacyHeaders: false, 
 	
