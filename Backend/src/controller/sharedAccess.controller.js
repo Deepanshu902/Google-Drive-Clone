@@ -15,11 +15,18 @@ const share = asyncHandler(async(req,res)=>{
         throw new ApiError(400, "All fields are required")
     }
 
+    // Capitalize resourceType to match model enum
+    const normalizedType = resourceType.charAt(0).toUpperCase() + resourceType.slice(1).toLowerCase();
     
-    const resource = resourceType === "folder" ? await Folder.findById(resourceId) : await File.findById(resourceId)
+    // Check if it's valid
+    if (!['File', 'Folder'].includes(normalizedType)) {
+        throw new ApiError(400, "Invalid resource type")
+    }
+    
+    const resource = normalizedType === "Folder" ? await Folder.findById(resourceId) : await File.findById(resourceId)
 
     if (!resource) {
-        throw new ApiError(404, `${resourceType} not found`)
+        throw new ApiError(404, `${normalizedType} not found`)
     }
 
    
@@ -37,7 +44,7 @@ const share = asyncHandler(async(req,res)=>{
     
     sharedAccess = await SharedAccess.create({
         resourceId,
-        resourceType,
+        resourceType: normalizedType,  // Use capitalized version
         sharedBy: req.user._id,
         sharedWith: [{ userId: sharedWithUserId, accessType }]
     })
@@ -110,10 +117,13 @@ const removeAccess = asyncHandler(async(req,res)=>{
 const userWithFolderAccess = asyncHandler(async(req,res)=>{
     const { resourceId } = req.params
 
-    let sharedAccess = await SharedAccess.findOne({ resourceId }).populate("sharedWith.userId", "name email")
+    let sharedAccess = await SharedAccess.findOne({ resourceId })
+        .populate("sharedWith.userId", "name email")
 
     if (!sharedAccess) {
-        throw new ApiError(404, "No shared access found for this resource")
+        return res.status(200).json(
+            new ApiResponse(200, [], "No users have access yet")
+        )
     }
 
     return res.status(200)
@@ -121,13 +131,48 @@ const userWithFolderAccess = asyncHandler(async(req,res)=>{
 })
 
 const listWithAccessToUser = asyncHandler(async(req,res)=>{
-    let sharedResources = await SharedAccess.find({ "sharedWith.userId": req.user._id })
-    .populate("resourceId", "folderName fileName")
+    let sharedAccesses = await SharedAccess.find({ "sharedWith.userId": req.user._id })
+        .populate("sharedBy", "name email")
+
+    if (sharedAccesses.length === 0) {
+        return res.status(200).json(
+            new ApiResponse(200, [], "No shared resources")
+        )
+    }
+
+    // Fetch actual resources
+    const resources = await Promise.all(
+        sharedAccesses.map(async (access) => {
+            let resource;
+            if (access.resourceType === "Folder") {  // Changed from "folder"
+                resource = await Folder.findById(access.resourceId);
+            } else {
+                resource = await File.findById(access.resourceId);
+            }
+
+            if (!resource) return null;
+
+            // Find user's access type
+            const userAccess = access.sharedWith.find(
+                u => u.userId.toString() === req.user._id.toString()
+            );
+
+            return {
+                ...resource.toObject(),
+                resourceType: access.resourceType, // Already capitalized
+                accessType: userAccess?.accessType || "view",
+                sharedBy: access.sharedBy,
+                sharedAt: access.createdAt
+            };
+        })
+    );
+
+    // Filter out null values
+    const validResources = resources.filter(r => r !== null);
 
     return res.status(200)
-    .json(new ApiResponse(200, sharedResources, "Shared resources fetched successfully"))
+    .json(new ApiResponse(200, validResources, "Shared resources fetched successfully"))
 })
-
 export {
     share,
     updateAccess,

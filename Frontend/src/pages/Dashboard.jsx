@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentUser, getStorage, logoutUser } from "../services/authService";
 import { login, setStorage, logout } from "../store/authSlice";
@@ -22,7 +22,10 @@ const Dashboard = () => {
   const { folders, currentFolderId } = useSelector((state) => state.folder);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // UI State
   const [showCreateFolder, setShowCreateFolder] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -58,7 +61,6 @@ const Dashboard = () => {
           await new Promise(resolve => setTimeout(resolve, 200));
         }
         
-        // Fetch files and folders
         const [filesResponse, foldersResponse] = await Promise.all([
           getFiles(),
           getFolders()
@@ -76,7 +78,6 @@ const Dashboard = () => {
     fetchData();
   }, [dispatch]);
 
-  // Filter folders and files for current directory
   const currentFolders = folders.filter(
     folder => (folder.parentFolderId || null) === currentFolderId && !folder.isDeleted
   );
@@ -88,10 +89,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-600 border-t-transparent mx-auto"></div>
-          <p className="mt-4 text-[14px] text-black/60">Loading your files...</p>
-        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-600 border-t-transparent"></div>
       </div>
     );
   }
@@ -99,19 +97,9 @@ const Dashboard = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
-          <p className="text-[17px] text-black/80 mb-4 font-medium">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-[14px] font-medium hover:bg-blue-700 transition-colors"
-          >
-            Refresh page
-          </button>
+        <div className="text-center">
+            <p className="text-red-500 mb-4">{error}</p>
+            <button onClick={() => window.location.reload()} className="px-4 py-2 bg-blue-600 text-white rounded">Refresh</button>
         </div>
       </div>
     );
@@ -125,7 +113,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-white antialiased">
       
       {/* Navigation Bar */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/5">
+      <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-black/5">
         <div className="max-w-[1200px] mx-auto px-6 py-3 flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center gap-2">
@@ -139,7 +127,7 @@ const Dashboard = () => {
             </span>
           </div>
 
-          {/* User Info & Logout */}
+          {/* User Info & Logout (RESTORED ORIGINAL DESIGN) */}
           <div className="flex items-center gap-4">
             {userData && (
               <div className="hidden sm:flex items-center gap-3">
@@ -162,148 +150,128 @@ const Dashboard = () => {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="max-w-[1200px] mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <main className="max-w-[1200px] mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
-          {/* Main Column - Folders & Files */}
-          <div className="lg:col-span-2 space-y-8">
+          {/* Main Content Area */}
+          <div className="lg:col-span-3 space-y-6">
             
-            {/* Breadcrumb & New Folder Button */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="flex items-center justify-between"
-            >
+            {/* Action Bar: Breadcrumbs + NEW BUTTONS */}
+            <div className="flex items-center justify-between">
               <Breadcrumb />
-              <button
-                onClick={() => setShowCreateFolder(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-xl text-[14px] font-medium text-black hover:bg-slate-50 transition-all"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                New Folder
-              </button>
-            </motion.div>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowCreateFolder(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
+                  New Folder
+                </button>
+                
+                <button
+                  onClick={() => setShowUploadModal(true)}
+                  className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-sm font-medium shadow-md hover:shadow-lg transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                  Upload File
+                </button>
+              </div>
+            </div>
 
             {/* Folders Section */}
-            {currentFolders.length > 0 && (
-              <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                <h2 className="text-[17px] font-semibold text-black mb-3">
-                  Folders
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <h2 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">Folders</h2>
+              {currentFolders.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {currentFolders.map((folder) => (
                     <FolderItem key={folder._id} folder={folder} />
                   ))}
                 </div>
-              </motion.section>
-            )}
-
-            {/* Upload Section */}
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-            >
-              <div className="mb-4">
-                <h2 className="text-[28px] font-semibold text-black -tracking-[0.015em]">
-                  Upload files
-                </h2>
-                <p className="text-[14px] text-black/60 mt-1">
-                  {currentFolderId ? "Upload to current folder" : "Add new files to your storage"}
-                </p>
-              </div>
-              <FileUpload />
-            </motion.section>
+              ) : (
+                <p className="text-sm text-gray-400 italic">No folders in this directory</p>
+              )}
+            </div>
 
             {/* Files Section */}
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            >
-              <div className="mb-4">
-                <h2 className="text-[28px] font-semibold text-black -tracking-[0.015em]">
-                  Files
-                </h2>
-                <p className="text-[14px] text-black/60 mt-1">
-                  {currentFiles.length} {currentFiles.length === 1 ? 'file' : 'files'}
-                </p>
-              </div>
-              <FileList />
-            </motion.section>
+            <div>
+               <h2 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">Files</h2>
+               <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                  <FileList /> 
+               </div>
+            </div>
           </div>
 
-          {/* Sidebar - Storage Info */}
+          {/* Right Sidebar - Storage */}
           <div className="lg:col-span-1">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.3 }}
-              className="sticky top-24 bg-slate-50 rounded-2xl border border-black/5 p-6"
-            >
-              <h3 className="text-[17px] font-semibold text-black mb-6 -tracking-[0.022em]">
-                Storage
-              </h3>
-
-              {storage && (
-                <div className="space-y-6">
-                  {/* Storage Amount */}
-                  <div className="text-center">
-                    <div className="text-[48px] font-semibold text-black -tracking-[0.015em] leading-none">
-                      {usedStorageGB}
-                      <span className="text-[21px] text-black/40 font-normal"> GB</span>
-                    </div>
-                    <div className="text-[13px] text-black/60 mt-2">
-                      of {totalStorageGB} GB used
-                    </div>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="space-y-2">
-                    <div className="w-full bg-black/5 rounded-full h-2 overflow-hidden">
-                      <div 
-                        className="h-full bg-blue-600 rounded-full transition-all duration-500"
-                        style={{ width: `${Math.min(usagePercentage, 100)}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between text-[11px] text-black/50">
-                      <span>{usagePercentage.toFixed(1)}% used</span>
-                      <span>{(totalStorageGB - usedStorageGB).toFixed(2)} GB free</span>
-                    </div>
-                  </div>
-
-                  {/* Storage Warning */}
-                  {usagePercentage > 80 && (
-                    <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
-                      <p className="text-[13px] text-orange-900 font-medium">
-                        Storage almost full
-                      </p>
-                      <p className="text-[12px] text-orange-700 mt-1">
-                        Consider deleting unused files or upgrading your plan
-                      </p>
-                    </div>
-                  )}
+             <div className="sticky top-24">
+                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                   <h3 className="font-semibold text-gray-900 mb-4">Storage Details</h3>
+                   <div className="relative pt-1">
+                      <div className="flex mb-2 items-center justify-between">
+                        <div>
+                          <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                            {usagePercentage.toFixed(0)}%
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs font-semibold inline-block text-blue-600">
+                            {usedStorageGB} / {totalStorageGB} GB
+                          </span>
+                        </div>
+                      </div>
+                      <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+                        <div style={{ width: `${usagePercentage}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
+                      </div>
+                   </div>
+                   <p className="text-xs text-gray-500 mt-4">
+                      Upgrade your plan to get more storage space for your projects.
+                   </p>
                 </div>
-              )}
-            </motion.div>
+             </div>
           </div>
 
         </div>
       </main>
 
-      {/* Create Folder Modal */}
+      {/* MODALS */}
       <CreateFolderModal 
         isOpen={showCreateFolder} 
         onClose={() => setShowCreateFolder(false)} 
       />
+
+      <AnimatePresence>
+        {showUploadModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            onClick={(e) => {
+                 if(e.target === e.currentTarget) setShowUploadModal(false)
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden"
+            >
+              <div className="p-4 border-b border-gray-100 flex justify-between items-center">
+                 <h3 className="font-semibold text-lg">Upload Files</h3>
+                 <button onClick={() => setShowUploadModal(false)} className="text-gray-400 hover:text-gray-600">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                 </button>
+              </div>
+              
+              <div className="p-6">
+                 <FileUpload onUploadComplete={() => setShowUploadModal(false)} />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 };

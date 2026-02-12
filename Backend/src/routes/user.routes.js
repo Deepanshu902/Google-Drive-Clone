@@ -7,7 +7,8 @@ import {
     updateAccountDetails,
     getCurrentUser,
     changeCurrentPassword,
-    getUserStorage
+    getUserStorage,
+    searchUserByEmail
         } from "../controller/user.controller.js"
 import {upload} from "../middleware/multer.middleware.js"
 
@@ -28,5 +29,7 @@ router.get("/current-user",verifyJWT,getCurrentUser)
 router.post("/change-password",verifyJWT,changeCurrentPassword)
 
 router.get("/storage",verifyJWT,getUserStorage)
+
+router.get("/search",verifyJWT,searchUserByEmail) 
 
 export default router

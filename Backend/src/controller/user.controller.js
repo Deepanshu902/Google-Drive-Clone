@@ -176,6 +176,31 @@ const getUserStorage = asyncHandler(async (req, res) => {
    .json(new ApiResponse(200, user, "Storage details fetched successfully"));
 });
 
+const searchUserByEmail = asyncHandler(async(req, res) => {
+    const { email } = req.query;
+
+    if (!email) {
+        throw new ApiError(400, "Email is required");
+    }
+
+    // Search for user (excluding password and refreshToken)
+    const user = await User.findOne({ email: email.toLowerCase() })
+        .select("-password -refreshToken");
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    // Don't allow sharing with yourself
+    if (user._id.toString() === req.user._id.toString()) {
+        throw new ApiError(400, "Cannot share with yourself");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, user, "User found")
+    );
+});
+
 
 export {
    registerUser,
@@ -184,5 +209,6 @@ export {
    updateAccountDetails,
    getCurrentUser,
    changeCurrentPassword,
-   getUserStorage
+   getUserStorage,
+   searchUserByEmail
 }
