@@ -5,6 +5,7 @@ import { deleteFile } from "../services/fileService";
 import { removeFile } from "../store/fileSlice";
 import MoveFileModal from "./MoveFileModal";
 import ShareModal from "./ShareModal";
+import { memo } from "react";
 
 // File type icons
 const getFileIcon = (contentType) => {
@@ -194,4 +195,4 @@ const FileItem = ({ file }) => {
   );
 };
 
-export default FileItem;
+export default memo(FileItem);

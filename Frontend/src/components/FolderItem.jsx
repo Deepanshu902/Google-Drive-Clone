@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { deleteFolder, renameFolder } from "../services/folderService";
 import { removeFolder, navigateToFolder, updateFolder } from "../store/folderSlice";
 import ShareModal from "./ShareModal";
+import { memo } from "react";
 
 const FolderItem = ({ folder }) => {
   const dispatch = useDispatch();
@@ -168,4 +169,4 @@ const FolderItem = ({ folder }) => {
   );
 };
 
-export default FolderItem;
+export default memo(FolderItem);
