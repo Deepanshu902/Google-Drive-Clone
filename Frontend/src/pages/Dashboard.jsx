@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion} from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentUser, getStorage, logoutUser } from "../services/authService";
@@ -12,7 +12,7 @@ import FileList from "../components/FileList";
 import FolderItem from "../components/FolderItem";
 import CreateFolderModal from "../components/CreateFolderModal";
 import Breadcrumb from "../components/Breadcrumb";
-import { useNavigate, Link } from "react-router-dom";  // Added Link here
+import { useNavigate, Link } from "react-router-dom";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -26,6 +26,8 @@ const Dashboard = () => {
   // UI State
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef(null);
 
   const handleLogout = async () => {
     try {
@@ -78,6 +80,18 @@ const Dashboard = () => {
     fetchData();
   }, [dispatch]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const currentFolders = folders.filter(
     folder => (folder.parentFolderId || null) === currentFolderId && !folder.isDeleted
   );
@@ -127,33 +141,69 @@ const Dashboard = () => {
             </span>
           </div>
 
-          {/* User Info with Settings Link */}
-          <div className="flex items-center gap-4">
-            {userData && (
-              <div className="hidden sm:flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-[13px]">
-                  {userData.name?.charAt(0).toUpperCase()}
+          {/* Profile Dropdown */}
+          <div className="relative" ref={profileMenuRef}>
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              className="flex items-center gap-3 hover:bg-slate-50 rounded-full px-3 py-2 transition-colors"
+            >
+              {userData && (
+                <>
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-[13px]">
+                    {userData.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="hidden sm:block text-left">
+                    <p className="text-[13px] font-medium text-black">{userData.name}</p>
+                    <p className="text-[11px] text-black/50">{userData.email}</p>
+                  </div>
+                  <svg 
+                    className={`w-4 h-4 text-black/60 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </>
+              )}
+            </button>
+
+            {/* Dropdown Menu */}
+            {showProfileMenu && (
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-black/5 py-2 z-50">
+                {/* User Info in Dropdown */}
+                <div className="px-4 py-3 border-b border-black/5">
+                  <p className="text-[14px] font-medium text-black">{userData?.name}</p>
+                  <p className="text-[12px] text-black/50">{userData?.email}</p>
                 </div>
-                <div className="text-left">
-                  <p className="text-[13px] font-medium text-black">{userData.name}</p>
-                  <p className="text-[11px] text-black/50">{userData.email}</p>
-                </div>
+
+                {/* Menu Items */}
+                <Link
+                  to="/settings"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors text-[14px] text-black"
+                >
+                  <svg className="w-5 h-5 text-black/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Settings
+                </Link>
+
+                <button
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    handleLogout();
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors text-[14px] text-red-600"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Sign out
+                </button>
               </div>
             )}
-            
-            <Link
-              to="/settings"
-              className="text-[13px] font-medium text-black/60 hover:text-black transition-colors"
-            >
-              Settings
-            </Link>
-            
-            <button 
-              onClick={handleLogout}
-              className="text-[13px] font-medium text-black/60 hover:text-black transition-colors"
-            >
-              Sign out
-            </button>
           </div>
         </div>
       </nav>
