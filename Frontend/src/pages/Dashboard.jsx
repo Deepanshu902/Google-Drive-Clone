@@ -12,7 +12,7 @@ import FileList from "../components/FileList";
 import FolderItem from "../components/FolderItem";
 import CreateFolderModal from "../components/CreateFolderModal";
 import Breadcrumb from "../components/Breadcrumb";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";  // Added Link here
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -127,7 +127,7 @@ const Dashboard = () => {
             </span>
           </div>
 
-          {/* User Info & Logout (RESTORED ORIGINAL DESIGN) */}
+          {/* User Info with Settings Link */}
           <div className="flex items-center gap-4">
             {userData && (
               <div className="hidden sm:flex items-center gap-3">
@@ -140,6 +140,14 @@ const Dashboard = () => {
                 </div>
               </div>
             )}
+            
+            <Link
+              to="/settings"
+              className="text-[13px] font-medium text-black/60 hover:text-black transition-colors"
+            >
+              Settings
+            </Link>
+            
             <button 
               onClick={handleLogout}
               className="text-[13px] font-medium text-black/60 hover:text-black transition-colors"
@@ -240,8 +248,7 @@ const Dashboard = () => {
         onClose={() => setShowCreateFolder(false)} 
       />
 
-     
-    
+      {/* Upload Modal */}
       {showUploadModal && (
         <>
           <div
@@ -273,7 +280,6 @@ const Dashboard = () => {
           </div>
         </>
       )}
-     
 
     </div>
   );

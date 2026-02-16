@@ -5,7 +5,8 @@ import {
   LandingPage,
   Login,
   SignupPage,
-  SharedWithMe
+  SharedWithMe,
+  Settings
 } from "./pages/index"
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element={<Login/>}/>
         <Route path="/signup" element={<SignupPage/>}/>
         <Route path="/shared-with-me" element={<SharedWithMe/>}/>
+        <Route path="/settings" element={<Settings/>}/> 
       </Routes>
     </Router>
   );
