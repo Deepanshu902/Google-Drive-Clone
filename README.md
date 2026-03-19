@@ -2,10 +2,10 @@
 
 A full-stack file storage and management platform. Users can upload files, organize them into folders, and share resources with others — all through a clean React frontend backed by a Node.js REST API deployed on AWS EC2.
 
-**Frontend:** [google-drive-clone-virid.vercel.app](https://google-drive-clone-virid.vercel.app)  
+**Frontend:** [Vercel](https://google-drive-clone-virid.vercel.app)  
 **Backend API:** [AWS EC2](https://term-urw-sport-radio.trycloudflare.com/api/v1/)
 
-![CI](https://github.com/Deepanshu902/Google-Drive-Clone/actions/workflows/deploy.yml/badge.svg)
+![CI](https://github.com/Deepanshu902/Google-Drive-Clone/actions/workflows/deploy.yml/badge.svg?branch=main)
 
 ---
 
