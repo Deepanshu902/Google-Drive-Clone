@@ -1,51 +1,147 @@
-# Google Drive Clone Backend
+# Google Drive Clone
 
-This is the backend API for a Google Drive clone, allowing users to authenticate, upload files, create folders, and share resources.
+A full-stack file storage and management platform. Users can upload files, organize them into folders, and share resources with others — all through a clean React frontend backed by a Node.js REST API deployed on AWS EC2.
 
-## 🚀 Live API Documentation
-View API documentation here: [Postman Documentation](https://documenter.getpostman.com/view/40572133/2sAYdhKqBc)
-<br />
-AWS API here: [AWS](https://term-urw-sport-radio.trycloudflare.com)
-<br/>
-Frontend is Live now: [vercel](https://google-drive-clone-virid.vercel.app)
+**Frontend:** [google-drive-clone-virid.vercel.app](https://google-drive-clone-virid.vercel.app)  
+**Backend API:** [AWS EC2](https://term-urw-sport-radio.trycloudflare.com/api/v1/)
 
-## 🛠 Technologies Used
-- Node.js
-- Express.js
-- MongoDB
-- JWT Authentication
-- Multer (for file uploads)
-- Cloudinary (for cloud storage)
-- AWS (for deployment)
+![CI](https://github.com/Deepanshu902/Google-Drive-Clone/actions/workflows/deploy.yml/badge.svg)
 
-## 📌 Features
-- **User Authentication:** Secure registration and login with JWT.
-- **File Management:** Upload, list, and delete files.
-- **Folder Management:** Create, rename, and delete folders.
-- **Sharing:** Share files/folders with other users.
+---
 
-## 📑 API Endpoints
-For checking API health, use `/healthz`, which will return a response "ok"
+## Screenshots
 
-### 🔹 User Routes
-- **POST** `/api/v1/users/register` - Register a new user.
-- **POST** `/api/v1/users/login` - Authenticate user and return a JWT.
-- **GET** `/api/v1/users/current-user` - Get details of the logged-in user.
-- **POST** `/api/v1/users/change-password` - Update user password.
-- **PATCH** `/api/v1/users/update-account-details` - Modify user details.
+### Dashboard
+![Dashboard](./screenshots/dashboard.png)
 
-### 🔹 File Routes
-- **POST** `/api/v1/file/upload` - Upload a file to Cloudinary.
-- **GET** `/api/v1/file/` - Retrieve user’s stored files.
-- **DELETE** `/api/v1/file/{fileId}` - Delete a file.
+### File Upload
+![Upload](./screenshots/upload.png)
 
-### 🔹 Folder Routes
-- **POST** `/api/v1/folder/createFolder` - Create a new folder.
-- **GET** `/api/v1/folder/list` - List all folders.
-- **PATCH** `/api/v1/folder/{folderId}/rename` - Rename a folder.
-- **DELETE** `/api/v1/folder/{folderId}` - Delete a folder.
+### Folder View
+![Folders](./screenshots/folders.png)
 
-### 🔹 Shared Access Routes
-- **POST** `/api/v1/shared/share` - Share a file/folder with another user.
-- **GET** `/api/v1/shared/user-resources` - Get files/folders shared with the user.
+### Shared Files
+![Shared](./screenshots/shared.png)
 
+---
+
+## Tech Stack
+
+| Layer | Tech |
+|-------|------|
+| Frontend | React.js |
+| Backend | Node.js, Express.js |
+| Database | MongoDB + Mongoose |
+| Storage | Cloudinary |
+| Auth | JWT |
+| DevOps | Docker, GitHub Actions (CI/CD), AWS EC2 |
+
+---
+
+## Features
+
+- **Authentication** — Register and log in with JWT-based session management
+- **File Management** — Upload, view, and delete files stored on Cloudinary
+- **Folder Management** — Create, rename, and delete folders
+- **Sharing** — Share files and folders with other registered users
+- **Security** — Rate limiting, input validation, secure password hashing
+
+---
+
+## API Overview
+
+Base URL: `/api/v1`
+
+### Users
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/users/register` | Register a new user |
+| POST | `/users/login` | Login and receive a JWT |
+| GET | `/users/current-user` | Get logged-in user details |
+| POST | `/users/change-password` | Update password |
+| PATCH | `/users/update-account-details` | Update profile info |
+
+### Files
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/file/upload` | Upload a file |
+| GET | `/file/` | List all files |
+| DELETE | `/file/:fileId` | Delete a file |
+
+### Folders
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/folder/createFolder` | Create a folder |
+| GET | `/folder/list` | List all folders |
+| PATCH | `/folder/:folderId/rename` | Rename a folder |
+| DELETE | `/folder/:folderId` | Delete a folder |
+
+### Shared Access
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/shared/share` | Share a file or folder |
+| GET | `/shared/user-resources` | View files shared with you |
+
+Health check: `GET /healthz` → returns `"ok"`
+
+---
+
+## Local Setup
+
+### Prerequisites
+- Node.js v18+
+- MongoDB (local or Atlas)
+- Cloudinary account
+
+### Steps
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/Deepanshu902/Google-Drive-Clone.git
+   cd Google-Drive-Clone
+   ```
+
+2. Install dependencies
+   ```sh
+   # Backend
+   cd backend
+   npm install
+
+   # Frontend
+   cd ../frontend
+   npm install
+   ```
+
+3. Set up environment variables  
+   Create a `.env` file in the `backend` folder:
+   ```env
+   PORT=8000
+   MONGODB_URI=your_mongodb_uri
+   JWT_SECRET=your_jwt_secret
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
+   ```
+
+4. Run locally
+   ```sh
+   # Backend
+   cd backend
+   npm run dev
+
+   # Frontend
+   cd frontend
+   npm run dev
+   ```
+
+---
+
+## CI/CD
+
+Every push to `main` triggers a GitHub Actions workflow that SSHs into the AWS EC2 instance and redeploys the updated backend automatically.
+
+---
+
+## License
+
+MIT License
