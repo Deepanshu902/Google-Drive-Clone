@@ -5,8 +5,6 @@ A full-stack file storage and management platform. Users can upload files, organ
 **Frontend:** [Vercel](https://google-drive-clone-virid.vercel.app)  
 **Backend API:** [AWS EC2](https://term-urw-sport-radio.trycloudflare.com/api/v1/)
 
-![CI](https://github.com/Deepanshu902/Google-Drive-Clone/actions/workflows/deploy.yml/badge.svg?branch=main)
-
 ---
 
 ## Screenshots
